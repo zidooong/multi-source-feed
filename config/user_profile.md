@@ -21,7 +21,7 @@ AI/tech product enthusiast and builder.
 - Entertainment, sports, politics (unless impacting the tech industry)
 
 ## Key Players (must-cover entities)
-// An incomplete demo version. Make your own full list
+// Didn't have time to thoroughly build this list. Please add on.
 
 ### AI Labs
 OpenAI, Anthropic, Google DeepMind, Meta AI, Mistral, xAI, DeepSeek, Moonshot/Kimi, Minimax, ByteDance/Doubao, Alibaba/Qwen, Cohere, AI21, Stability AI, 01.AI, Baichuan, Zhipu/GLM, Perplexity, etc.
