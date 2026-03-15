@@ -219,7 +219,7 @@ crontab -e
 
 ## 自定义信息源
 
-默认的 `config/sources.yaml` 包含一组示例源（X、HN、GitHub Trending、AI 博客、科技媒体、独立博客、VC 博客、arXiv、Reddit、Product Hunt、Tavily 搜索）。**这个列表还未经过充分筛选和拓展**，请根据自己的需求增删。
+默认的 `config/sources.yaml` 包含一组信息源（X、HN、GitHub Trending、AI 博客、科技媒体、独立博客、VC 博客、arXiv、Reddit、Product Hunt、Tavily 搜索）。**但这个列表暂未经过充分筛选和拓展**，请根据自己的需求增删。
 
 加一个 RSS 源 = 4 行 YAML，无需写代码：
 
