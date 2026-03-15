@@ -154,11 +154,11 @@ Scrape (crontab, pure Python)          Memo (OpenClaw cron, LLM)
 ─────────────────────────────          ──────────────────────────
 09:00  python -m src.pipeline          09:20  LLM reads feed_slim.json
   │                                      │
-  ├─ Fetch all enabled sources            ├─ Reads config/user_profile.md
+  ├─ Fetch all enabled sources           ├─ Reads config/user_profile.md
   ├─ Intra-day dedup (URL + title)       ├─ Reads config/preferences.md
   ├─ Cross-day dedup (memo/*.md)         ├─ Generates 5-section brief
   ├─ Write feed_merged.json              ├─ Sends to user
-  └─ Write feed_slim.json (LLM input)   └─ Saves memo/YYYY-MM-DD.md
+  └─ Write feed_slim.json (LLM input)    └─ Saves memo/YYYY-MM-DD.md
 ```
 
 **Key design decisions / 关键设计决策:**
