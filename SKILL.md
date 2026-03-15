@@ -27,10 +27,10 @@ If clone already exists, skip to `pip install`.
 
 ### Step 2: API Keys
 
-Ask the user for two API keys:
+Some sources require API keys that the user must register themselves. Ask the user for:
 
-1. **Tavily** (free): sign up at https://tavily.com and copy the API key
-2. **Product Hunt** (free): get a developer token at https://api.producthunt.com/v2/docs
+1. **Tavily** (free): powers web search to catch trending topics not covered by RSS feeds. Sign up at https://tavily.com
+2. **Product Hunt** (free): required for the Product Hunt GraphQL API. Get a token at https://api.producthunt.com/v2/docs
 
 Once the user provides both keys, write them to `~/multi-source-feed/.env`:
 
@@ -56,17 +56,19 @@ cd ~/multi-source-feed && source .venv/bin/activate && python login_save_session
 
 This script connects to the already-open Chrome instance via CDP (Chrome DevTools Protocol) on port 9222, extracts the session/cookies, and saves them to `x_session.json` in the project root. It does **not** open a new browser window — it requires Chrome to already be running with `--remote-debugging-port=9222`.
 
-### Step 4: Personalize (Optional)
+### Step 4: Customize
+
+**This step directly affects the quality of the daily brief.** Strongly encourage the user to customize before proceeding.
 
 Ask the user:
-> "The default profile is set up for AI/tech product enthusiasts. Would you like to customize your interests, or use the defaults?"
+> "The default profile is a generic template. I strongly recommend customizing these files to match your interests — this directly determines the quality of your daily brief. What topics do you care about? What should be filtered out?"
 
-If they want to customize:
-- Read `config/user_profile.md`, modify based on their described interests
-- Optionally adjust `config/sources.yaml` (enable/disable sources)
-- Optionally adjust `config/preferences.md` (change memo sections/style)
+Based on their response:
+- Edit `config/user_profile.md` — set their interests, non-interests, and Key Players to track
+- Adjust `config/sources.yaml` if needed (enable/disable sources, add their own RSS feeds)
+- Adjust `config/preferences.md` if they want different memo sections or format
 
-If they say "skip" or "defaults are fine", move on.
+If they insist on skipping, move on — but remind them they can customize later.
 
 ### Step 5: Test Run
 
@@ -78,19 +80,22 @@ Show the user the output summary (number of sources, items fetched, any errors).
 
 ### Step 6: Schedule
 
-**Scraping (crontab):**
+The system runs in two phases. Phase 1 (scraping) must complete before Phase 2 (memo generation) starts.
+
+**Phase 1: Scrape (crontab)** — Pure Python job that fetches all sources, deduplicates, and writes `feed_slim.json`. Set up a daily cron job:
 ```bash
 (crontab -l 2>/dev/null; echo "0 9 * * * cd ~/multi-source-feed && .venv/bin/python3 -m src.pipeline >> /tmp/msf-scrape.log 2>&1") | crontab -
 ```
 
-**Memo generation (OpenClaw cron):**
-Create an OpenClaw cron job that runs daily (e.g., 20 minutes after scrape). The job should:
-1. Check if `feed_slim.json` exists and is from today
-2. Read `config/user_profile.md` and `config/preferences.md`
-3. Read `feed_slim.json`
-4. Generate the daily brief following preferences.md format
-5. Send the memo to the user via their configured channel
-6. Save the memo to `memo/YYYY-MM-DD.md`
+**Phase 2: Memo (OpenClaw cron)** — LLM-powered job that generates the daily brief and sends it to the user. Must run ~20 min after Phase 1 to ensure scraping is complete.
+
+Create an OpenClaw cron job that:
+1. Checks if `feed_slim.json` exists and is from today
+2. Reads `config/user_profile.md` and `config/preferences.md`
+3. Reads `feed_slim.json` (the scrape output)
+4. Generates the daily brief following preferences.md format
+5. Sends the brief to the user via their configured channel
+6. Saves the brief to `memo/YYYY-MM-DD.md` (used for cross-day dedup)
 
 Tell the user:
 > "Setup complete! Your daily brief will be generated every morning. You'll receive it through your configured messaging channel."
