@@ -132,7 +132,7 @@ To enable: set up an OpenClaw cron job running `push/run.sh` every 2 hours. Cust
 npx clawhub install multi-source-feed
 ```
 
-然后对 OpenClaw agent 说：**"帮我设置 multi-source-feed"**，它会自动完成以下步骤 1-6。
+然后告诉 OpenClaw：**"帮我设置 multi-source-feed"**，它会自动完成以下步骤 1-6。
 
 > **注意：** 自动安装效果取决于你 OpenClaw 使用的模型能力。如果模型较弱导致安装失败，请改用方式 B 手动安装。
 
@@ -148,7 +148,7 @@ pip install -r requirements.txt && playwright install chromium
 
 #### 步骤 2 — 配置密钥
 
-部分数据源需要 API 密钥。Tavily 用于搜索热点话题（补充 RSS 覆盖不到的内容），Product Hunt 的 GraphQL 接口需要开发者 token。两者都免费。
+部分数据源需要 API 密钥，需要自己注册并填入.env。Tavily 用于搜索热点话题（补充 RSS 覆盖不到的内容），Product Hunt 的 GraphQL 接口需要开发者 token。
 
 ```bash
 cp .env.example .env
@@ -158,7 +158,7 @@ cp .env.example .env
 
 #### 步骤 3 — X/Twitter 登录
 
-X/Twitter 没有公开的 feed 读取 API。Pipeline 通过 Playwright 用真实浏览器会话抓取你的 X 时间线，需要登录一次以保存 session cookies。
+X/Twitter 没有公开的 feed 读取 API。Pipeline 通过 Playwright 用真实浏览器会话抓取你的 X 时间线，需要登录一次自己的账号以保存 session cookies。
 
 ```bash
 # 1. 打开 Chrome 远程调试
