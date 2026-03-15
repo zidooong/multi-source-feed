@@ -150,14 +150,28 @@ Add 4 lines to `config/sources.yaml`:
 
 ## X-Push (Optional)
 
-X-Push sends real-time X/Twitter highlights every 2 hours. To enable:
+If the user wants real-time X/Twitter highlights every 2 hours (in addition to the daily brief):
 
-1. Set up an OpenClaw cron job running `push/run.sh` every 2 hours
-2. Customize `push/user_profile.md` with your interests
-3. The push module shares `x_session.json` and `.venv` with the main pipeline
+1. Ask the user to customize `push/user_profile.md` with their interests
+2. Create an OpenClaw cron job (every 2 hours) with this prompt:
 
-## Architecture
+```
+Execute these steps in order:
 
-Your configured sources → Python pipeline → dedup (URL + title similarity + cross-day memo) → `feed_slim.json` → LLM generates structured memo → delivered to user.
+1. Run: bash ~/multi-source-feed/push/run.sh
+   (Wait for it to finish, usually 2-3 minutes)
 
-See `docs/architecture.md` for the full system diagram.
+2. If exit code is non-zero, notify the user that X Push scraping failed, then stop.
+
+3. Read push/new_posts.json. If the posts array is empty, stop silently.
+
+4. Read push/preferences.md for filtering rules and output format.
+
+5. Read push/user_profile.md to understand what the reader cares about.
+
+6. Filter and send noteworthy posts following the format in push/preferences.md.
+
+7. End.
+```
+
+The push module shares `x_session.json` and `.venv` with the main pipeline — no extra setup needed.

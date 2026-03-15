@@ -114,11 +114,18 @@ Adding a new RSS source = 4 lines, zero code:
 
 ---
 
-## Initiate X-Push (Optional)
+## X-Push (Optional)
 
-Real-time X/Twitter highlights every 2 hours, complementing the daily brief with breaking updates.
+Real-time X/Twitter highlights every 2 hours, complementing the daily brief with breaking updates. The push module shares `x_session.json` and `.venv` with the main pipeline — no extra setup needed.
 
-To enable: set up an OpenClaw cron job running `push/run.sh` every 2 hours. Customize `push/user_profile.md` with your interests. The push module shares `x_session.json` and `.venv` with the main pipeline — no extra setup needed.
+**To enable:**
+
+1. Customize `push/user_profile.md` with your interests
+2. Create an OpenClaw cron job that runs every 2 hours. The job should:
+   - Run `bash ~/multi-source-feed/push/run.sh` (scrapes X, deduplicates, writes `push/new_posts.json`)
+   - Read `push/preferences.md` for filtering rules and output format
+   - Read `push/new_posts.json` — if empty, stop silently
+   - Filter posts per `push/user_profile.md`, then send noteworthy ones to you
 
 ---
 
@@ -226,11 +233,18 @@ crontab -e
 
 ---
 
-## 开启X-Push（可选）
+## 开启 X-Push（可选）
 
-每 2 小时推送 X/Twitter 上的亮点，与每日简报互补，捕捉实时动态。
+每 2 小时推送 X/Twitter 上的亮点，与每日简报互补，捕捉实时动态。push 模块与主 pipeline 共享 `x_session.json` 和 `.venv`，无需额外配置。
 
-启用方法：设置一个 OpenClaw cron job 每 2 小时运行 `push/run.sh`。在 `push/user_profile.md` 中自定义你的兴趣。push 模块与主 pipeline 共享 `x_session.json` 和 `.venv`，无需额外配置。
+**启用方法：**
+
+1. 在 `push/user_profile.md` 中自定义你的兴趣
+2. 创建一个每 2 小时运行的 OpenClaw cron job，它需要：
+   - 运行 `bash ~/multi-source-feed/push/run.sh`（抓取 X、去重、写入 `push/new_posts.json`）
+   - 读取 `push/preferences.md` 了解筛选规则和输出格式
+   - 读取 `push/new_posts.json` — 如果为空则静默结束
+   - 按 `push/user_profile.md` 筛选帖子，将值得关注的推送给你
 
 ---
 
