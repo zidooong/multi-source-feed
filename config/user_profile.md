@@ -5,40 +5,33 @@
 AI/tech product enthusiast and builder.
 
 ## Interested In
-- AI product launches, updates, and major feature changes
-- Technical breakthroughs that unlock new application scenarios (new model capabilities, new interaction paradigms)
-- AI company strategy, funding, acquisitions, and industry landscape shifts
-- AI ecosystem productization progress
-- New paradigms in developer tools (practically usable ones)
-- Academic breakthroughs with far-reaching impact
+<!-- Customize: add your own version -->
 
 ## Not Interested In
-- Pure infrastructure optimization (GPU communication, cluster scheduling, data center engineering)
-- Low-level frameworks far from product use (sandbox platforms, compilers, test frameworks)
-- Cryptocurrency (unless directly AI-related)
-- Entertainment, sports, politics (unless impacting the tech industry)
+<!-- Customize: add your own version -->
 
 ## Key Players (must-cover entities)
+<!-- An incomplete demo version. Make your own full list-->
 
 ### AI Labs
-OpenAI, Anthropic, Google DeepMind, Meta AI, Mistral, xAI, DeepSeek, Moonshot/Kimi, Minimax, ByteDance/Doubao, Alibaba/Qwen, Cohere, AI21, Stability AI, 01.AI, Baichuan, Zhipu/GLM, Perplexity
+OpenAI, Anthropic, Google DeepMind, Meta AI, Mistral, xAI, DeepSeek, Moonshot/Kimi, Minimax, ByteDance/Doubao, Alibaba/Qwen, Cohere, AI21, Stability AI, 01.AI, Baichuan, Zhipu/GLM, Perplexity, etc.
 
 ### AI Products & Consumer Frontends
-ChatGPT, Gemini, Perplexity, Claude, Notion AI, Midjourney, Runway, Suno, Lovable, Bolt
+ChatGPT, Gemini, Perplexity, Claude, Notion AI, Midjourney, Runway, Suno, Lovable, Bolt, etc.
 
 ### Developer Tools & AI Coding
-Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Vercel, v0, Replit, OpenClaw, Figma AI, Linear
+Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Vercel, v0, Replit, OpenClaw, Figma AI, Linear, etc.
 
 ### Platforms & Model Distribution
-Hugging Face, Together AI, Groq, Fireworks AI
+Hugging Face, Together AI, Groq, Fireworks AI,etc.
 
 ### Cloud & AI Hardware
-AWS, Azure, GCP, NVIDIA, AMD, Apple Silicon
+AWS, Azure, GCP, NVIDIA, AMD, Apple Silicon,etc.
 
 ### Social & Distribution
-X/Twitter, TikTok, YouTube, Reddit, Product Hunt
+X/Twitter, TikTok, YouTube, Reddit, Product Hunt,etc.
 
 ### Investment & Incubation
-a16z, Sequoia, Y Combinator
+a16z, Sequoia, Y Combinator,etc.
 
 > If any of the above entities have major news (product launch, funding, strategic partnership, major controversy), it MUST appear in the brief.
