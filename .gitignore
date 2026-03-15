@@ -1,0 +1,38 @@
+# Secrets
+.env
+x_session.json
+
+# Runtime data
+feed_raw.json
+feed_raw_partial.json
+feed_merged.json
+feed_slim.json
+data/
+memo/
+
+# Push runtime
+push/feed_raw.json
+push/feed_raw_partial.json
+push/new_posts.json
+push/seen_posts.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Planning (dev only)
+task_plan.md
+findings.md
+progress.md
