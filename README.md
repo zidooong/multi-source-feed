@@ -20,7 +20,7 @@ Your Sources → Fetch → Dedup → LLM Memo → Daily Brief (5 sections)
 npx clawhub install multi-source-feed
 ```
 
-Then tell your OpenClaw agent: **"help me set up multi-source-feed"** — it handles Steps 1-6 below automatically.
+Then tell OpenClaw: **"help me set up multi-source-feed"** — it handles Steps 1-6 below automatically.
 
 > **Note:** Auto-setup quality depends on the LLM model powering your OpenClaw agent. Weaker models may fail mid-setup. If that happens, fall back to Option B.
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt && playwright install chromium
 
 #### Step 2 — API Keys
 
-Some sources require API keys. Tavily powers web search (catching trending topics not covered by any feed), and Product Hunt requires an API token for its GraphQL endpoint. Both are free.
+Some sources require API keys — you'll need to register and fill them into `.env`. Tavily powers web search (catching trending topics not covered by any feed), and Product Hunt requires an API token for its GraphQL endpoint.
 
 ```bash
 cp .env.example .env
@@ -46,7 +46,7 @@ cp .env.example .env
 
 #### Step 3 — X/Twitter Login
 
-X/Twitter has no public API for feed reading. The pipeline uses Playwright to scrape your X timeline via a real browser session. You need to log in once so it can save your session cookies.
+X/Twitter has no public API for feed reading. The pipeline uses Playwright to scrape your X timeline via a real browser session. You need to log in to your own account once so it can save your session cookies.
 
 ```bash
 # 1. Open Chrome with remote debugging
@@ -58,7 +58,7 @@ python login_save_session.py
 
 #### Step 4 — Customize
 
-**This step directly affects the quality of your daily brief.** The default profile is a generic template — customize it to match your interests, otherwise the LLM won't know what to prioritize or filter out.
+**This step directly affects the quality of your daily brief.** It is strongly recommended to customize these three files to match your interests before proceeding.
 
 | File | What to edit |
 |---|---|
@@ -79,7 +79,7 @@ python -m src.pipeline
 
 The system runs in two phases. Phase 1 (scraping) must finish before Phase 2 (memo generation) starts.
 
-**Phase 1: Scrape (crontab)** — Pure Python. Fetches all sources, deduplicates, and writes `feed_slim.json`.
+**Phase 1: Scrape (crontab)** — Pure Python. Fetches all sources, deduplicates, and writes `feed_slim.json`. You need to set up a daily cron job on your machine.
 
 ```bash
 crontab -e
@@ -87,7 +87,7 @@ crontab -e
 0 9 * * * cd ~/multi-source-feed && .venv/bin/python3 -m src.pipeline >> /tmp/msf-scrape.log 2>&1
 ```
 
-**Phase 2: Memo (OpenClaw cron)** — LLM-powered. Reads `feed_slim.json` + your `config/` files, generates a structured daily brief, and sends it via your messaging channel. Schedule ~20 min after Phase 1.
+**Phase 2: Memo (OpenClaw cron)** — LLM-powered. Reads `feed_slim.json` + your `config/` files, generates a structured daily brief, and sends it via your messaging channel. Schedule ~20 min after Phase 1 to ensure scraping is fully complete.
 
 Create an OpenClaw cron job that:
 1. Reads `config/user_profile.md` and `config/preferences.md` to understand your preferences
@@ -100,7 +100,7 @@ Create an OpenClaw cron job that:
 
 ## Adding Sources
 
-The starter `config/sources.yaml` includes a demo set of sources (X, HN, GitHub Trending, AI blogs, tech media, indie blogs, VC blogs, arXiv, Reddit, Product Hunt, Tavily search). **This list is not meant to be complete** — customize it for your own interests.
+The starter `config/sources.yaml` includes a demo set of sources (X, HN, GitHub Trending, AI blogs, tech media, indie blogs, VC blogs, arXiv, Reddit, Product Hunt, Tavily search). **This list has not been thoroughly curated or expanded** — customize it for your own interests.
 
 Adding a new RSS source = 4 lines, zero code:
 
