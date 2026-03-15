@@ -4,118 +4,71 @@ AI-curated daily tech brief from customizable sources, delivered via your prefer
 
 AI 驱动的每日科技简报，聚合多个可配置信息源，通过你配置的消息通道推送。
 
----
-
-## How It Works / 工作原理
-
 ```
-Your Sources                  Pipeline                     You
-┌──────────────────┐    ┌──────────────────┐    ┌──────────────┐
-│ X/Twitter        │    │                  │    │              │
-│ Hacker News      │    │  Fetch → Dedup   │    │  Daily Brief │
-│ GitHub Trending  │───▶│  → Filter        │───▶│  (~25 items) │
-│ AI Blogs (RSS)   │    │  → LLM Memo      │    │              │
-│ Tech Media (RSS) │    │                  │    │  Structured  │
-│ Indie Blogs      │    └──────────────────┘    │  5 sections  │
-│ Reddit           │     09:00 scrape           └──────────────┘
-│ Product Hunt     │     09:20 memo generate
-│ Web Search       │
-│ + your own RSS   │
-└──────────────────┘
+Your Sources → Fetch → Dedup → LLM Memo → Daily Brief (5 sections)
 ```
-
-**Included source types / 支持的源类型：**
-X/Twitter, Hacker News, GitHub Trending, AI company blogs (RSS), tech media (RSS), independent blogs, VC blogs, arXiv, Reddit, Product Hunt, Tavily web search. See `config/sources.yaml` for the full starter list — add, remove, or swap sources freely.
-
-**Memo Sections / 简报板块:**
-🧠 Tech & Models · 🚀 Products & Tools · 💡 Ideas · ♟️ Business & Strategy · 🔭 Signals
 
 ---
 
-## Quick Start / 快速开始
+## Setup / 安装
 
-### Prerequisites / 前提条件
+> **Prerequisites / 前提条件:** Python 3.9+, [OpenClaw](https://openclaw.ai), a messaging channel (Telegram, Discord, Feishu, etc.)
 
-- Python 3.9+
-- [OpenClaw](https://openclaw.ai) (for memo generation & delivery)
-- A messaging channel configured in OpenClaw (Telegram, Discord, Feishu, etc.)
-
-### Option A: Install via ClawHub / 通过 ClawHub 安装
+### Step 1 — Install / 安装
 
 ```bash
-npx clawhub install multi-source-feed
-```
-
-Then ask your OpenClaw agent: **"help me set up multi-source-feed"** — it will guide you through everything interactively.
-
-然后对 OpenClaw agent 说：**"帮我设置 multi-source-feed"** — 它会交互式引导你完成所有步骤。
-
-### Option B: Manual Setup / 手动安装
-
-```bash
-# 1. Clone / 克隆
-git clone https://github.com/zidooong/multi-source-feed.git
-cd multi-source-feed
-
-# 2. Install dependencies / 安装依赖
+git clone https://github.com/zidooong/multi-source-feed.git && cd multi-source-feed
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
-
-# 3. Configure API keys / 配置 API 密钥
-cp .env.example .env
-# Edit .env — fill in your TAVILY_API_KEY and PRODUCTHUNT_API_TOKEN
-# 编辑 .env — 填入你的 TAVILY_API_KEY 和 PRODUCTHUNT_API_TOKEN
-
-# 4. X/Twitter login / X 登录
-python login_save_session.py
-# A browser will open — log in to your X account, then close the browser.
-# 浏览器会弹出 — 登录你的 X 账号，然后关闭浏览器。
-
-# 5. Test run / 验证
-python -m src.pipeline
-# You should see "Pipeline completed" with items from all enabled sources.
-# 你应该看到 "Pipeline completed"，包含所有已启用源的数据。
+pip install -r requirements.txt && playwright install chromium
 ```
 
-### Schedule / 设置定时
+### Step 2 — API Keys / 配置密钥
 
-**Scraping (crontab) / 爬取：**
 ```bash
-# Run daily at 09:00 / 每天 09:00 运行
-crontab -e
-# Add: 0 9 * * * cd ~/multi-source-feed && .venv/bin/python3 -m src.pipeline >> /tmp/msf-scrape.log 2>&1
+cp .env.example .env
+# Fill in TAVILY_API_KEY (free: https://tavily.com)
+# Fill in PRODUCTHUNT_API_TOKEN (free: https://api.producthunt.com/v2/docs)
 ```
 
-**Memo generation (OpenClaw cron) / 简报生成：**
+### Step 3 — X/Twitter Login / X 登录
 
-Create an OpenClaw cron job that runs ~20 minutes after scraping. The job should:
+```bash
+# Open Chrome with remote debugging / 打开 Chrome 远程调试
+open -a 'Google Chrome' --args --remote-debugging-port=9222
+# Log in to X/Twitter in that Chrome window, then run:
+# 在弹出的 Chrome 中登录 X，然后运行：
+python login_save_session.py
+```
 
-创建一个 OpenClaw cron job，在爬取后约 20 分钟运行：
+### Step 4 — Customize (optional) / 个性化（可选）
 
-1. Read `config/user_profile.md` and `config/preferences.md`
-2. Read `feed_slim.json` (the pipeline output)
-3. Generate a daily brief following the preferences format
-4. Send the brief to the user
-5. Save the brief to `memo/YYYY-MM-DD.md`
+| File / 文件 | What to edit / 改什么 |
+|---|---|
+| `config/user_profile.md` | Your interests & Key Players / 你的兴趣和关键实体 |
+| `config/sources.yaml` | Enable/disable/add sources / 开关或添加信息源 |
+| `config/preferences.md` | Memo format & filtering rules / 简报格式和筛选规则 |
+
+### Step 5 — Test / 验证
+
+```bash
+python -m src.pipeline
+# "Pipeline completed" = success ✓
+```
+
+### Step 6 — Schedule / 定时运行
+
+**Scraping / 爬取** — add to crontab:
+```
+0 9 * * * cd ~/multi-source-feed && .venv/bin/python3 -m src.pipeline >> /tmp/msf-scrape.log 2>&1
+```
+
+**Memo generation / 简报生成** — create an OpenClaw cron job ~20 min after scraping. It reads `feed_slim.json` + `config/` files, generates the brief, and sends it to you.
 
 ---
 
-## Customization / 自定义配置
+## Adding Sources / 添加源
 
-All customizable files are in `config/`. You only need to touch this directory.
-
-所有可自定义文件都在 `config/` 目录下。你只需要修改这个目录。
-
-| File / 文件 | Purpose / 用途 |
-|---|---|
-| `config/user_profile.md` | Your interests & Key Players to track / 你的兴趣和需要追踪的关键实体 |
-| `config/sources.yaml` | Enable/disable/add sources / 开关或添加信息源 |
-| `config/preferences.md` | Memo format, sections, filtering rules / 简报格式、板块、筛选规则 |
-
-### Adding a new RSS source / 添加 RSS 源
-
-Just 4 lines in `config/sources.yaml` — zero code:
+4 lines in `config/sources.yaml`, zero code:
 
 ```yaml
 - name: my-favorite-blog
@@ -125,59 +78,38 @@ Just 4 lines in `config/sources.yaml` — zero code:
   tags: [blog]
 ```
 
-### Changing your interests / 修改兴趣方向
-
-Edit `config/user_profile.md`. The LLM uses this to filter and prioritize items.
-
-修改 `config/user_profile.md`，LLM 会根据这个文件来筛选和排序内容。
+The starter list includes: X/Twitter, Hacker News, GitHub Trending, AI company blogs, tech media, indie blogs, VC blogs, arXiv, Reddit, Product Hunt, Tavily search. See `config/sources.yaml` for the full list.
 
 ---
 
 ## X-Push (Optional) / X-Push（可选）
 
-X-Push sends real-time X/Twitter highlights every 2 hours — complementing the daily brief with breaking updates.
+Real-time X/Twitter highlights every 2 hours, complementing the daily brief.
 
-X-Push 每 2 小时推送 X/Twitter 上的新鲜事——与每日简报互补，捕捉实时动态。
+每 2 小时推送 X/Twitter 上的新鲜事，与每日简报互补。
 
-To enable, set up an OpenClaw cron job running `push/run.sh` every 2 hours. Customize `push/user_profile.md` with your interests.
-
-启用方法：设置一个 OpenClaw cron job 每 2 小时运行 `push/run.sh`。在 `push/user_profile.md` 中自定义你的兴趣。
+Set up an OpenClaw cron job running `push/run.sh` every 2 hours. Customize `push/user_profile.md`.
 
 ---
 
 ## Architecture / 架构
 
-See [docs/architecture.md](docs/architecture.md) for the full system diagram.
+See [docs/architecture.md](docs/architecture.md) for the full diagram.
 
 ```
-Scrape (crontab, pure Python)          Memo (OpenClaw cron, LLM)
-─────────────────────────────          ──────────────────────────
-09:00  python -m src.pipeline          09:20  LLM reads feed_slim.json
-  │                                      │
-  ├─ Fetch all enabled sources           ├─ Reads config/user_profile.md
-  ├─ Intra-day dedup (URL + title)       ├─ Reads config/preferences.md
-  ├─ Cross-day dedup (memo/*.md)         ├─ Generates 5-section brief
-  ├─ Write feed_merged.json              ├─ Sends to user
-  └─ Write feed_slim.json (LLM input)    └─ Saves memo/YYYY-MM-DD.md
+Scrape (crontab)                      Memo (OpenClaw cron)
+────────────────                      ────────────────────
+python -m src.pipeline                LLM reads feed_slim.json
+  ├─ Fetch all enabled sources          ├─ Reads config/*
+  ├─ Dedup (URL + title + cross-day)    ├─ Generates 5-section brief
+  └─ Write feed_slim.json               └─ Sends to user + saves memo
 ```
 
-**Key design decisions / 关键设计决策:**
-- **Config-driven sources**: Adding an RSS source = 4 lines of YAML, zero code / 配置驱动：加 RSS 源 = 4 行 YAML
-- **Memo-based cross-day dedup**: Compares against delivered memos, not raw data / 跨天去重基于已推送的 memo
-- **Two-phase cron**: Scraping (pure Python) and memo (LLM) run separately / 双阶段 cron：爬取和生成分开运行
-- **7-day freshness filter**: RSS and blog sources auto-filter items older than 7 days / 7 天时效过滤
-
----
-
-## Tech Stack / 技术栈
-
-- **Language**: Python 3.9+
-- **X scraper**: Playwright (headed Chrome, cookie-based auth)
-- **HTTP**: requests + BeautifulSoup
-- **RSS**: feedparser
-- **APIs**: Algolia (HN), GraphQL (Product Hunt), JSON (Reddit), Tavily (web search)
-- **Scheduling**: crontab (scrape) + OpenClaw cron (memo)
-- **LLM**: Any model supported by OpenClaw
+**Key decisions / 设计决策:**
+- Config-driven: add RSS source = 4 lines YAML / 加 RSS 源 = 4 行 YAML
+- Memo-based cross-day dedup / 跨天去重基于 memo
+- Two-phase cron: scrape and memo run separately / 爬取和生成分开
+- 7-day freshness filter on RSS / RSS 7 天时效过滤
 
 ---
 
