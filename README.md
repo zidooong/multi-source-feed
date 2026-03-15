@@ -170,7 +170,7 @@ python login_save_session.py
 
 #### 步骤 4 — 个性化
 
-**这一步直接影响你每天收到的简报质量。** 默认配置是通用模板，你必须根据自己的兴趣定制，否则 LLM 不知道该重点关注什么、过滤掉什么。
+**这一步直接影响你每天收到的简报质量。** 开始前强烈建议根据自己的兴趣完善这三份文件。
 
 | 文件 | 改什么 |
 |---|---|
@@ -191,7 +191,7 @@ python -m src.pipeline
 
 系统分两个阶段运行。阶段 1（爬取）必须在阶段 2（生成简报）之前完成。
 
-**阶段 1：爬取（crontab）**— 纯 Python 任务，抓取所有源、去重、输出 `feed_slim.json`。
+**阶段 1：爬取（crontab）**— 纯 Python 任务，抓取所有源、去重、输出 `feed_slim.json`。需要给你的Mac设置一条每天自动爬取的任务。
 
 ```bash
 crontab -e
@@ -199,7 +199,7 @@ crontab -e
 0 9 * * * cd ~/multi-source-feed && .venv/bin/python3 -m src.pipeline >> /tmp/msf-scrape.log 2>&1
 ```
 
-**阶段 2：生成简报（OpenClaw cron）**— LLM 任务，读取 `feed_slim.json` 和 `config/` 配置，生成结构化日报，通过你配置的消息渠道推送。需要在阶段 1 之后约 20 分钟运行。
+**阶段 2：生成简报（OpenClaw cron）**— LLM 任务，读取 `feed_slim.json` 和 `config/` 配置，生成结构化日报，通过你配置的消息渠道推送。需要在阶段 1 之后约 20 分钟运行，确保爬取已全部完成。
 
 创建一个 OpenClaw cron job：
 1. 读取 `config/user_profile.md` 和 `config/preferences.md` 了解你的偏好
@@ -212,7 +212,7 @@ crontab -e
 
 ## 添加源
 
-默认的 `config/sources.yaml` 包含一组示例源（X、HN、GitHub Trending、AI 博客、科技媒体、独立博客、VC 博客、arXiv、Reddit、Product Hunt、Tavily 搜索）。**这个列表不是完整的**，你应该根据自己的需求增删。
+默认的 `config/sources.yaml` 包含一组示例源（X、HN、GitHub Trending、AI 博客、科技媒体、独立博客、VC 博客、arXiv、Reddit、Product Hunt、Tavily 搜索）。**这个列表还未经过充分筛选和拓展**，请根据自己的需求增删。
 
 加一个 RSS 源 = 4 行 YAML，无需写代码：
 
