@@ -28,7 +28,7 @@ class RedditSource(BaseSource):
         url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={max_items + 5}"
         resp = requests.get(
             url,
-            headers={"User-Agent": "xfeed-agent:v1.0 (memo pipeline)"},
+            headers={"User-Agent": "multi-source-feed:v1.0 (memo pipeline)"},
             timeout=15,
         )
         resp.raise_for_status()

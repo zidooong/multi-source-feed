@@ -7,59 +7,59 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 
 # ============================================================
-#  配置
+#  Configuration
 # ============================================================
-TARGET_POSTS_PER_TAB = 60   # 每个 tab 抓取目标条数（合并去重后总数会少一些）
-MAX_SCROLLS = 70            # 每个 tab 最多滚动次数
-WAIT_SECONDS = 3            # 每次滚动后等待秒数
-SCRAPE_TRENDING = True      # 是否爬取 Explore/Trending 页
-TRENDING_TOPIC_COUNT = 10   # 抓取多少个 trending 话题
+TARGET_POSTS_PER_TAB = 60   # Target posts per tab (total will be less after dedup)
+MAX_SCROLLS = 70            # Max scroll attempts per tab
+WAIT_SECONDS = 3            # Wait time (seconds) after each scroll
+SCRAPE_TRENDING = True      # Whether to scrape Explore/Trending page
+TRENDING_TOPIC_COUNT = 10   # Number of trending topics to collect
 
-# 健壮性配置
-MAX_RETRIES = 3             # 页面加载重试次数
-RETRY_DELAY = 5             # 重试间隔秒数
-STALE_SCROLL_LIMIT = 5      # 连续多少次滚动无新帖则提前退出
-GLOBAL_TIMEOUT = 600         # 全局超时秒数（10分钟）
+# Robustness settings
+MAX_RETRIES = 3             # Page load retry count
+RETRY_DELAY = 5             # Retry interval in seconds
+STALE_SCROLL_LIMIT = 5      # Exit early after this many consecutive scrolls with no new posts
+GLOBAL_TIMEOUT = 600         # Global timeout in seconds (10 minutes)
 
 
 # ============================================================
-#  全局超时保护
+#  Global timeout protection
 # ============================================================
 def timeout_handler(signum, frame):
-    print("\n❌ 全局超时！正在保存已有数据并退出...")
+    print("\n[ERROR] Global timeout! Saving existing data and exiting...")
     raise TimeoutError("Global timeout reached")
 
-# 仅在支持 SIGALRM 的系统上设置（Linux/macOS）
+# Only set on systems that support SIGALRM (Linux/macOS)
 if hasattr(signal, 'SIGALRM'):
     signal.signal(signal.SIGALRM, timeout_handler)
 
 
 # ============================================================
-#  重试工具
+#  Retry utility
 # ============================================================
-def retry(func, *args, retries=MAX_RETRIES, delay=RETRY_DELAY, desc="操作"):
-    """通用重试包装器"""
+def retry(func, *args, retries=MAX_RETRIES, delay=RETRY_DELAY, desc="operation"):
+    """Generic retry wrapper"""
     for attempt in range(1, retries + 1):
         try:
             return func(*args)
         except Exception as e:
-            print(f"   ⚠️ {desc} 第 {attempt} 次失败: {e}")
+            print(f"   [WARN] {desc} attempt {attempt} failed: {e}")
             if attempt < retries:
-                print(f"   ⏳ {delay}s 后重试...")
+                print(f"   [WAIT] Retrying in {delay}s...")
                 time.sleep(delay)
             else:
-                print(f"   ❌ {desc} 已达最大重试次数 ({retries})")
+                print(f"   [ERROR] {desc} reached max retries ({retries})")
                 raise
 
 # ============================================================
-#  主流程
+#  Main flow
 # ============================================================
 def scrape_feed():
-    # 启动全局超时
+    # Start global timeout
     if hasattr(signal, 'SIGALRM'):
         signal.alarm(GLOBAL_TIMEOUT)
 
-    # 用于存放部分结果，确保崩溃时也能保存
+    # Store partial results so data is saved even on crash
     partial_result = {
         "scraped_at": datetime.now().isoformat(),
         "stats": {},
@@ -84,69 +84,69 @@ def scrape_feed():
                 Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
             """)
 
-            # ---------- 1. 打开首页（带重试）----------
-            print("🌐 打开 X 首页...")
+            # ---------- 1. Open home page (with retry) ----------
+            print("[INFO] Opening X home page...")
             retry(
                 lambda: page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=30000),
-                retries=MAX_RETRIES, delay=RETRY_DELAY, desc="打开首页"
+                retries=MAX_RETRIES, delay=RETRY_DELAY, desc="open home page"
             )
             time.sleep(6)
 
-            # ---------- 2. 先爬 For You（默认 tab）----------
-            print("\n📌 ===== 开始爬取 For You tab =====")
+            # ---------- 2. Scrape For You (default tab) ----------
+            print("\n[INFO] ===== Scraping For You tab =====")
             wait_for_tweets(page)
             for_you_posts = collect_posts(page, source="for_you")
-            print(f"✅ For You 爬取完成: {len(for_you_posts)} 条")
+            print(f"[OK] For You scraping done: {len(for_you_posts)} posts")
 
-            # 立即暂存，防止后续崩溃丢数据
+            # Save immediately to prevent data loss on subsequent crash
             partial_result["posts"] = for_you_posts
             save_partial(partial_result, "feed_raw_partial.json")
 
-            # ---------- 3. 切到 Following tab 爬取 ----------
-            print("\n📌 ===== 切换到 Following tab =====")
+            # ---------- 3. Switch to Following tab ----------
+            print("\n[INFO] ===== Switching to Following tab =====")
             following_posts = []
             try:
                 tab = page.locator('[role="tab"]:has-text("Following")')
                 tab.first.click()
                 time.sleep(4)
 
-                # 强制回到页面顶部，避免从中间开始爬
+                # Force scroll to top to avoid starting from the middle
                 page.evaluate("window.scrollTo(0, 0)")
                 time.sleep(2)
 
-                # 验证是否真的切换成功：检查 tab 的 aria-selected
+                # Verify tab switch: check aria-selected attribute
                 try:
                     is_selected = tab.first.get_attribute("aria-selected")
                     if is_selected == "true":
-                        print("   ✅ 已确认切换到 Following")
+                        print("   [OK] Confirmed switch to Following")
                     else:
-                        print("   ⚠️ tab 点击了但 aria-selected 不是 true，可能没切换成功")
+                        print("   [WARN] Tab clicked but aria-selected is not true, switch may have failed")
                 except Exception:
                     pass
 
                 wait_for_tweets(page)
                 following_posts = collect_posts(page, source="following")
-                print(f"✅ Following 爬取完成: {len(following_posts)} 条")
+                print(f"[OK] Following scraping done: {len(following_posts)} posts")
             except Exception as e:
-                print(f"   ❌ Following 爬取失败: {e}，继续使用 For You 数据")
+                print(f"   [ERROR] Following scraping failed: {e}, continuing with For You data")
 
-            # ---------- 4. 合并去重 ----------
+            # ---------- 4. Merge and deduplicate ----------
             merged = merge_posts(for_you_posts, following_posts)
-            print(f"\n📊 合并去重后总计: {len(merged)} 条")
+            print(f"\n[INFO] Total after merge and dedup: {len(merged)} posts")
             partial_result["posts"] = merged
             save_partial(partial_result, "feed_raw_partial.json")
 
-            # ---------- 5. 爬取 Trending（可选）----------
+            # ---------- 5. Scrape Trending (optional) ----------
             trending = []
             if SCRAPE_TRENDING:
-                print("\n📌 ===== 开始爬取 Trending =====")
+                print("\n[INFO] ===== Scraping Trending =====")
                 try:
                     trending = scrape_trending(page)
-                    print(f"✅ Trending 爬取完成: {len(trending)} 条")
+                    print(f"[OK] Trending scraping done: {len(trending)} topics")
                 except Exception as e:
-                    print(f"   ❌ Trending 爬取失败: {e}，跳过")
+                    print(f"   [ERROR] Trending scraping failed: {e}, skipping")
 
-            # ---------- 6. 输出 ----------
+            # ---------- 6. Output ----------
             output = {
                 "scraped_at": datetime.now().isoformat(),
                 "stats": {
@@ -161,18 +161,18 @@ def scrape_feed():
 
             with open("feed_raw.json", "w", encoding="utf-8") as f:
                 json.dump(output, f, ensure_ascii=False, indent=2)
-            print("\n💾 已保存到 feed_raw.json")
+            print("\n[OK] Saved to feed_raw.json")
 
             browser.close()
 
-            # 取消全局超时
+            # Cancel global timeout
             if hasattr(signal, 'SIGALRM'):
                 signal.alarm(0)
 
             return output
 
     except TimeoutError:
-        print("⏰ 全局超时触发，保存已有数据...")
+        print("[WARN] Global timeout triggered, saving existing data...")
         save_partial(partial_result, "feed_raw.json")
         if browser:
             try:
@@ -182,8 +182,8 @@ def scrape_feed():
         return partial_result
 
     except Exception as e:
-        print(f"\n❌ 意外错误: {e}")
-        print("💾 尝试保存已有数据...")
+        print(f"\n[ERROR] Unexpected error: {e}")
+        print("[INFO] Attempting to save existing data...")
         save_partial(partial_result, "feed_raw.json")
         if browser:
             try:
@@ -194,30 +194,30 @@ def scrape_feed():
 
 
 def save_partial(data, filename):
-    """保存部分结果到文件"""
+    """Save partial results to file"""
     try:
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"   💾 部分结果已暂存到 {filename}")
+        print(f"   [OK] Partial results saved to {filename}")
     except Exception as e:
-        print(f"   ⚠️ 暂存失败: {e}")
+        print(f"   [WARN] Failed to save partial results: {e}")
 
 
 # ============================================================
-#  帖子收集（通用，支持两个 tab）
+#  Post collection (generic, supports both tabs)
 # ============================================================
 def collect_posts(page, source="unknown"):
-    """在当前 tab 滚动收集帖子"""
+    """Scroll and collect posts from the current tab"""
     all_posts = []
-    seen_urls = set()      # 用 URL 去重比纯文本更可靠
-    seen_texts = set()     # 文本去重作为 fallback
+    seen_urls = set()      # URL-based dedup is more reliable than text-based
+    seen_texts = set()     # Text-based dedup as fallback
     scroll_count = 0
-    stale_count = 0        # 连续无新帖计数
+    stale_count = 0        # Consecutive no-new-post scroll counter
 
     while len(all_posts) < TARGET_POSTS_PER_TAB and scroll_count < MAX_SCROLLS:
         scroll_count += 1
         prev_count = len(all_posts)
-        print(f"   🔄 第 {scroll_count} 次滚动，已抓 {len(all_posts)}/{TARGET_POSTS_PER_TAB} 条...")
+        print(f"   [SCROLL] #{scroll_count}, collected {len(all_posts)}/{TARGET_POSTS_PER_TAB} posts...")
 
         articles = page.locator("article[data-testid='tweet']")
         count = articles.count()
@@ -229,12 +229,12 @@ def collect_posts(page, source="unknown"):
                 if post is None:
                     continue
 
-                # 去重：优先用 URL，fallback 用文本
+                # Dedup: prefer URL, fallback to text
                 dedup_key = post["url"] if post["url"] else post["text"]
                 if dedup_key in seen_urls or post["text"] in seen_texts:
                     continue
 
-                post["source"] = source  # 标记来源 tab
+                post["source"] = source  # Tag the source tab
                 seen_urls.add(dedup_key)
                 seen_texts.add(post["text"])
                 all_posts.append(post)
@@ -247,11 +247,11 @@ def collect_posts(page, source="unknown"):
         if len(all_posts) >= TARGET_POSTS_PER_TAB:
             break
 
-        # 防死循环：连续多次滚动无新帖则提前退出
+        # Prevent infinite loop: exit early after consecutive scrolls with no new posts
         if len(all_posts) == prev_count:
             stale_count += 1
             if stale_count >= STALE_SCROLL_LIMIT:
-                print(f"   ⚠️ 连续 {STALE_SCROLL_LIMIT} 次滚动无新帖，提前退出")
+                print(f"   [WARN] No new posts after {STALE_SCROLL_LIMIT} consecutive scrolls, exiting early")
                 break
         else:
             stale_count = 0
@@ -263,10 +263,10 @@ def collect_posts(page, source="unknown"):
 
 
 # ============================================================
-#  合并两个 tab 的帖子，去重并标记双来源
+#  Merge posts from both tabs, deduplicate and tag dual-source
 # ============================================================
 def merge_posts(for_you_posts, following_posts):
-    """合并两个 tab 的帖子，重复帖标记 source 为 both"""
+    """Merge posts from both tabs; duplicates are tagged with source='both'"""
     merged = {}
 
     for post in for_you_posts:
@@ -276,29 +276,29 @@ def merge_posts(for_you_posts, following_posts):
     for post in following_posts:
         key = post["url"] if post["url"] else post["text"]
         if key in merged:
-            # 同一帖子在两个 tab 都出现，标记为 both
+            # Same post appeared in both tabs, tag as 'both'
             merged[key]["source"] = "both"
-            # 取较高的 views（有时两次抓取数字略有差异）
+            # Keep the higher view count (numbers may differ slightly between scrapes)
             merged[key]["views"] = max(merged[key]["views"], post["views"])
         else:
             merged[key] = post
 
-    # 按 views 降序排列
+    # Sort by views descending
     result = sorted(merged.values(), key=lambda x: x.get("views", 0), reverse=True)
     return result
 
 
 # ============================================================
-#  Trending 爬取
+#  Trending scraper
 # ============================================================
 def scrape_trending(page):
-    """访问 Explore 页面，爬取 Trending 话题"""
+    """Visit the Explore page and scrape trending topics"""
     trending = []
     try:
         page.goto("https://x.com/explore/tabs/trending", wait_until="domcontentloaded", timeout=20000)
         time.sleep(5)
 
-        # Trending 条目通常在 [data-testid="trend"] 或 cellInnerDiv 里
+        # Trending entries are usually in [data-testid="trend"] or cellInnerDiv
         trends = page.locator('[data-testid="trend"]')
         count = min(trends.count(), TRENDING_TOPIC_COUNT)
 
@@ -307,7 +307,7 @@ def scrape_trending(page):
                 trend = trends.nth(i)
                 entry = {}
 
-                # 话题名称：通常是 trend 里最显眼的文本
+                # Topic name: usually the most prominent text in the trend element
                 texts = trend.locator("span").all()
                 text_contents = []
                 for t in texts:
@@ -318,21 +318,21 @@ def scrape_trending(page):
                     except Exception:
                         continue
 
-                # 尝试提取话题名（通常是最长或最突出的 span）
+                # Try to extract the topic name (usually the longest/most prominent span)
                 entry["topic"] = ""
                 entry["category"] = ""
                 entry["post_count"] = ""
 
                 for txt in text_contents:
                     txt_lower = txt.lower()
-                    # 类别行通常包含 "· Trending" 或具体类别
+                    # Category line usually contains "· Trending" or a specific category
                     if "trending" in txt_lower or "·" in txt:
                         entry["category"] = txt
-                    # 帖子数：包含 "posts"/"tweets"，或独立的数字格式（如 "21K", "1,234"）
+                    # Post count: contains "posts"/"tweets", or standalone number format (e.g. "21K", "1,234")
                     elif ("post" in txt_lower or "tweet" in txt_lower
                           or _looks_like_count(txt)):
                         entry["post_count"] = txt
-                    # 其余最长的文本作为话题名
+                    # Otherwise, use the longest text as the topic name
                     elif len(txt) > len(entry["topic"]):
                         entry["topic"] = txt
 
@@ -342,32 +342,32 @@ def scrape_trending(page):
                 continue
 
     except Exception as e:
-        print(f"   ⚠️ Trending 爬取失败: {e}")
+        print(f"   [WARN] Trending scraping failed: {e}")
 
     return trending
 
 
 # ============================================================
-#  单条帖子提取
+#  Single post extraction
 # ============================================================
 def extract_post(article):
     post = {}
 
-    # --- 检测是否为广告 ---
+    # --- Check if this is an ad ---
     try:
         ad_indicators = article.locator('span:has-text("Ad")').all()
         for indicator in ad_indicators:
             txt = indicator.inner_text(timeout=500).strip()
             if txt == "Ad":
-                return None  # 直接跳过广告
+                return None  # Skip ads
     except Exception:
         pass
 
-    # --- 检测是否为转推 (Retweet) ---
+    # --- Check if this is a retweet ---
     post["is_retweet"] = False
     post["retweeted_by"] = ""
     try:
-        # 转推会在帖子上方显示 "XXX reposted" 的社交信息
+        # Retweets show "XXX reposted" social context above the post
         social_context = article.locator('[data-testid="socialContext"]')
         if social_context.count() > 0:
             context_text = social_context.inner_text(timeout=2000)
@@ -377,7 +377,7 @@ def extract_post(article):
     except Exception:
         pass
 
-    # --- 作者 handle ---
+    # --- Author handle ---
     try:
         for link in article.locator('a[role="link"]').all():
             href = link.get_attribute("href") or ""
@@ -387,13 +387,13 @@ def extract_post(article):
     except Exception:
         post["author_handle"] = ""
 
-    # --- 作者显示名 ---
+    # --- Author display name ---
     try:
         post["author_name"] = article.locator('a[role="link"] span').first.inner_text(timeout=2000)
     except Exception:
         post["author_name"] = ""
 
-    # --- 帖子正文 ---
+    # --- Post body text ---
     try:
         text_el = article.locator("div[data-testid='tweetText']")
         post["text"] = text_el.inner_text(timeout=2000) if text_el.count() > 0 else ""
@@ -403,7 +403,7 @@ def extract_post(article):
     if not post["text"]:
         return None
 
-    # --- 帖子 URL 和时间戳 ---
+    # --- Post URL and timestamp ---
     try:
         time_el = article.locator("time")
         href = time_el.locator("..").first.get_attribute("href") or ""
@@ -416,7 +416,7 @@ def extract_post(article):
     except Exception:
         post["timestamp"] = ""
 
-    # --- 互动指标 ---
+    # --- Engagement metrics ---
     try:
         buttons = article.locator('[role="group"] button').all()
         labels = []
@@ -429,10 +429,10 @@ def extract_post(article):
     except Exception:
         post.update({"replies": 0, "reposts": 0, "likes": 0, "bookmarks": 0})
 
-    # --- Views（多策略提取）---
+    # --- Views (multi-strategy extraction) ---
     post["views"] = extract_views(article)
 
-    # --- 外部链接 ---
+    # --- External links ---
     try:
         seen_hrefs = set()
         links = []
@@ -441,7 +441,7 @@ def extract_post(article):
             if (href.startswith("http")
                     and "x.com" not in href
                     and "twitter.com" not in href
-                    and "t.co" not in href      # t.co 短链接通常会展开，单独排除
+                    and "t.co" not in href      # Exclude t.co short links (they usually expand)
                     and href not in seen_hrefs):
                 link_text = ""
                 try:
@@ -457,7 +457,7 @@ def extract_post(article):
     except Exception:
         post["external_links"] = []
 
-    # --- 引用推文 ---
+    # --- Quoted tweet ---
     try:
         quoted = article.locator('[data-testid="tweet"] [data-testid="tweet"]')
         if quoted.count() > 0:
@@ -468,7 +468,7 @@ def extract_post(article):
     except Exception:
         post["quoted_tweet"] = ""
 
-    # --- 是否包含媒体 ---
+    # --- Has media ---
     post["has_media"] = False
     try:
         media_selectors = [
@@ -487,12 +487,12 @@ def extract_post(article):
 
 
 # ============================================================
-#  Views 提取（多策略）
+#  Views extraction (multi-strategy)
 # ============================================================
 def extract_views(article):
-    """多策略提取 views 数"""
+    """Extract view count using multiple strategies"""
 
-    # 策略1: aria-label 里包含 "view"
+    # Strategy 1: aria-label containing "view"
     try:
         view_candidates = article.locator('a[href*="/analytics"]').all()
         for el in view_candidates:
@@ -504,14 +504,14 @@ def extract_views(article):
     except Exception:
         pass
 
-    # 策略2: app-text-transition-container（views 计数器）
+    # Strategy 2: app-text-transition-container (views counter)
     try:
-        # views 通常是 group 区域最后一个数字
+        # Views are usually the last number in the group area
         group = article.locator('[role="group"]')
         if group.count() > 0:
             containers = group.locator('[data-testid="app-text-transition-container"]').all()
             if containers:
-                # 最后一个通常是 views
+                # The last one is usually views
                 last = containers[-1]
                 txt = last.inner_text(timeout=1000).strip()
                 num = parse_abbreviated_number(txt)
@@ -520,7 +520,7 @@ def extract_views(article):
     except Exception:
         pass
 
-    # 策略3: 直接找 analytics 链接的文本
+    # Strategy 3: directly find analytics link text
     try:
         analytics_links = article.locator('a[href*="/analytics"]').all()
         for link in analytics_links:
@@ -536,21 +536,21 @@ def extract_views(article):
 
 
 # ============================================================
-#  数字解析工具
+#  Number parsing utilities
 # ============================================================
 def _looks_like_count(text):
-    """判断文本是否像帖子计数，如 '21K', '1,234', '50.2K'"""
+    """Check if text looks like a post count, e.g. '21K', '1,234', '50.2K'"""
     return bool(re.match(r'^[\d,.]+[KkMm]?(\+)?\s*(posts?|tweets?)?$', text.strip()))
 
 
 def parse_number_from_text(text):
-    """从文本中提取纯数字"""
+    """Extract a plain number from text"""
     num = "".join(c for c in text.replace(",", "") if c.isdigit())
     return int(num) if num else 0
 
 
 def parse_abbreviated_number(text):
-    """解析缩写数字，如 1.4M, 102K, 93.5K"""
+    """Parse abbreviated numbers, e.g. 1.4M, 102K, 93.5K"""
     text = text.strip().replace(",", "")
     try:
         if "M" in text.upper():
@@ -565,7 +565,7 @@ def parse_abbreviated_number(text):
 
 
 # ============================================================
-#  互动指标解析
+#  Engagement metrics parsing
 # ============================================================
 def parse_metrics(labels):
     result = {"replies": 0, "reposts": 0, "likes": 0, "bookmarks": 0}
@@ -580,20 +580,20 @@ def parse_metrics(labels):
 
 
 # ============================================================
-#  等待推文加载
+#  Wait for tweets to load
 # ============================================================
 def wait_for_tweets(page):
-    """等待推文加载完成"""
-    print("   ⏳ 等待帖子加载...")
+    """Wait for tweets to finish loading"""
+    print("   [WAIT] Waiting for posts to load...")
     try:
         page.wait_for_selector("article[data-testid='tweet']", timeout=15000)
         time.sleep(2)
     except Exception:
-        print("   ⚠️ 等待超时，继续尝试")
+        print("   [WARN] Wait timed out, continuing anyway")
 
 
 # ============================================================
-#  入口
+#  Entry point
 # ============================================================
 if __name__ == "__main__":
     scrape_feed()

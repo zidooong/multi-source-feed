@@ -1,4 +1,4 @@
-"""Unified data models and source interface for XFeed Memo."""
+"""Unified data models and source interface for Multi-Source Feed."""
 
 from __future__ import annotations
 

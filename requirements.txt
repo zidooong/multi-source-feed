@@ -1,4 +1,4 @@
-# XFeed Memo — Dependencies
+# Multi-Source Feed — Dependencies
 # Install: pip install -r requirements.txt
 
 # Core scraper (existing)
@@ -9,3 +9,6 @@ PyYAML>=6.0
 feedparser>=6.0
 beautifulsoup4>=4.12
 requests>=2.31
+
+# Testing
+pytest>=7.0

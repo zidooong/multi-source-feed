@@ -165,13 +165,13 @@ def run(config_path: str | Path = "config/sources.yaml", output_path: str | Path
         "generated_at": datetime.now().isoformat(),
         "date": today,
         "stats": stats,
-        "total_items": len(all_items),
+        "total_items": len(item_dicts),
         "items": item_dicts,
     }
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
-    print(f"\n💾 Saved {len(all_items)} items to {output_path}")
+    print(f"\n💾 Saved {len(item_dicts)} items to {output_path}")
 
     # Write slim version for LLM memo generation (strip content/extra/tags/timestamp)
     slim_items = [
@@ -197,5 +197,5 @@ def run(config_path: str | Path = "config/sources.yaml", output_path: str | Path
 
 
 if __name__ == "__main__":
-    config = sys.argv[1] if len(sys.argv) > 1 else "src/sources.yaml"
+    config = sys.argv[1] if len(sys.argv) > 1 else "config/sources.yaml"
     run(config_path=config)

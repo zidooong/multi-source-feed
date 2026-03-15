@@ -1,13 +1,13 @@
 ---
 name: multi-source-feed
-description: Set up and manage an AI-curated daily tech brief from 23 sources. Use when user says "set up multi-source-feed", "configure my daily brief", or "msf setup".
+description: Set up and manage an AI-curated daily tech brief from customizable sources. Use when user says "set up multi-source-feed", "configure my daily brief", or "msf setup".
 version: 1.0.0
 metadata: {"openclaw":{"emoji":"📡","requires":{"bins":["python3"],"env":["TAVILY_API_KEY"]},"primaryEnv":"TAVILY_API_KEY","homepage":"https://github.com/Jadeenn/multi-source-feed"}}
 ---
 
 # Multi-Source Feed
 
-AI-curated daily tech brief aggregated from 23 sources (X, HN, GitHub Trending, RSS blogs, Reddit, Product Hunt, Tavily, and more). Deduplicates, filters by your interests, and delivers a structured memo.
+AI-curated daily tech brief aggregated from customizable sources (X, HN, GitHub Trending, RSS blogs, Reddit, Product Hunt, Tavily, and more). Deduplicates, filters by your interests, and delivers a structured memo.
 
 ## Setup
 
@@ -42,15 +42,19 @@ PRODUCTHUNT_API_TOKEN=<user's key>
 ### Step 3: X/Twitter Login
 
 Tell the user:
-> "I'll open a browser window for you to log in to X/Twitter. After logging in, close the browser — your session will be saved automatically."
+> "To save your X/Twitter session, you need to:
+> 1. Open Chrome with remote debugging enabled by running:
+>    `open -a 'Google Chrome' --args --remote-debugging-port=9222`
+> 2. Log in to X/Twitter in that Chrome window
+> 3. Once logged in, I'll run a script that connects to that browser and saves your session cookies."
 
-Then run:
+After the user confirms they are logged in to X in Chrome, run:
 
 ```bash
 cd ~/multi-source-feed && source .venv/bin/activate && python login_save_session.py
 ```
 
-This creates `x_session.json` in the project root.
+This script connects to the already-open Chrome instance via CDP (Chrome DevTools Protocol) on port 9222, extracts the session/cookies, and saves them to `x_session.json` in the project root. It does **not** open a new browser window — it requires Chrome to already be running with `--remote-debugging-port=9222`.
 
 ### Step 4: Personalize (Optional)
 
@@ -149,6 +153,6 @@ X-Push sends real-time X/Twitter highlights every 2 hours. To enable:
 
 ## Architecture
 
-23 sources → Python pipeline → dedup (URL + title similarity + cross-day memo) → `feed_merged.json` → LLM generates structured memo → delivered to user.
+Your configured sources → Python pipeline → dedup (URL + title similarity + cross-day memo) → `feed_slim.json` → LLM generates structured memo → delivered to user.
 
 See `docs/architecture.md` for the full system diagram.

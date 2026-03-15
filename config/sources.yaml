@@ -1,6 +1,11 @@
-# XFeed Memo — Source Configuration
-# Add a new source: append an entry below. RSS sources need zero code.
-# Toggle any source: set enabled: true / false.
+# ─────────────────────────────────────────────
+# Multi-Source Feed — Source Configuration
+# This is a starter list — not exhaustive.
+# Customize it for your interests:
+#   - Disable sources you don't need (enabled: false)
+#   - Add your own RSS feeds (type: rss, 4 lines each)
+#   - See README.md for instructions
+# ─────────────────────────────────────────────
 
 sources:
 
@@ -112,13 +117,76 @@ sources:
     max_items: 10
     tags: [media, arstechnica, tech]
 
-  # ── Independent Blogs ─────────────────────────────────────────
+  - name: platformer
+    type: rss
+    enabled: true
+    url: https://www.platformer.news/rss/
+    max_items: 10
+    tags: [media, platformer, tech-policy]
+
+  # ── Independent Blogs / Newsletters (via RSS) ───────────────
   - name: simon-willison
     type: rss
     enabled: true
     url: https://simonwillison.net/atom/everything/
     max_items: 10
     tags: [blog, ai, dev-tools]
+
+  - name: lilian-weng
+    type: rss
+    enabled: true
+    url: https://lilianweng.github.io/index.xml
+    max_items: 10
+    tags: [blog, ai, ml-research]
+
+  - name: chip-huyen
+    type: rss
+    enabled: true
+    url: https://huyenchip.com/feed.xml
+    max_items: 10
+    tags: [blog, ai, mlops]
+
+  - name: stratechery
+    type: rss
+    enabled: true
+    url: https://stratechery.com/feed/
+    max_items: 10
+    tags: [blog, tech-strategy]
+
+  - name: one-useful-thing
+    type: rss
+    enabled: true
+    url: https://www.oneusefulthing.org/feed
+    max_items: 10
+    tags: [blog, ai, applications]
+
+  - name: jay-alammar
+    type: rss
+    enabled: true
+    url: https://jalammar.github.io/feed.xml
+    max_items: 10
+    tags: [blog, ai, ml-visualizations]
+
+  - name: sebastian-raschka
+    type: rss
+    enabled: true
+    url: https://sebastianraschka.com/rss_feed.xml
+    max_items: 10
+    tags: [blog, ai, ml-research]
+
+  - name: ahead-of-ai
+    type: rss
+    enabled: true
+    url: https://magazine.sebastianraschka.com/feed
+    max_items: 10
+    tags: [newsletter, ai, ml-research]
+
+  - name: benedict-evans
+    type: rss
+    enabled: true
+    url: https://www.ben-evans.com/benedictevans?format=rss
+    max_items: 10
+    tags: [blog, tech-strategy, analysis]
 
   # ── VC / Ecosystem ────────────────────────────────────────────
   - name: yc-blog
@@ -127,6 +195,35 @@ sources:
     url: https://www.ycombinator.com/blog/rss
     max_items: 10
     tags: [vc, yc, startup]
+
+  - name: a16z
+    type: rss
+    enabled: true
+    url: https://www.a16z.news/feed
+    max_items: 10
+    tags: [vc, a16z, startup]
+
+  - name: sequoia-capital
+    type: rss
+    enabled: true
+    url: https://www.sequoiacap.com/feed/
+    max_items: 10
+    tags: [vc, sequoia, startup]
+
+  # ── AI Research / Academic (via RSS) ─────────────────────────
+  - name: arxiv-cs-ai
+    type: rss
+    enabled: true
+    url: https://rss.arxiv.org/rss/cs.AI
+    max_items: 15
+    tags: [research, arxiv, ai]
+
+  - name: arxiv-cs-lg
+    type: rss
+    enabled: true
+    url: https://rss.arxiv.org/rss/cs.LG
+    max_items: 15
+    tags: [research, arxiv, machine-learning]
 
   # ── Reddit (JSON API, no auth needed) ────────────────────────────
   - name: reddit-sideproject

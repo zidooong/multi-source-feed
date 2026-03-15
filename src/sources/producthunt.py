@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -57,7 +57,7 @@ class ProductHuntSource(BaseSource):
 
         variables = {"first": max_items}
         posted_after = (
-            datetime.utcnow() - timedelta(days=lookback_days)
+            datetime.now(timezone.utc) - timedelta(days=lookback_days)
         ).strftime("%Y-%m-%dT00:00:00Z")
         variables["postedAfter"] = posted_after
 

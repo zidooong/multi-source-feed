@@ -1,4 +1,4 @@
-"""X Push — 爬取 + 去重，把新帖写到 new_posts.json，供 cron agent 筛选推送。"""
+"""X Push — scrape + dedup, write new posts to new_posts.json for the cron agent to filter and push."""
 
 from __future__ import annotations
 

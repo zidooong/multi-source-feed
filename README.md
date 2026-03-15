@@ -1,31 +1,31 @@
 # Multi-Source Feed 📡
 
-AI-curated daily tech brief from customized sources, delivered via your preferred messaging channel.
+AI-curated daily tech brief from customizable sources, delivered via your preferred messaging channel.
 
-AI 驱动的每日科技简报，聚合自定义信息源，通过你配置的消息通道推送。
+AI 驱动的每日科技简报，聚合多个可配置信息源，通过你配置的消息通道推送。
 
 ---
 
 ## How It Works / 工作原理
 
 ```
-Sources                    Pipeline                     You
+Your Sources                  Pipeline                     You
 ┌──────────────────┐    ┌──────────────────┐    ┌──────────────┐
 │ X/Twitter        │    │                  │    │              │
 │ Hacker News      │    │  Fetch → Dedup   │    │  Daily Brief │
 │ GitHub Trending  │───▶│  → Filter        │───▶│  (~25 items) │
-│ 8 AI Blogs (RSS) │    │  → LLM Memo      │    │              │
-│ 5 Tech Media     │    │                  │    │  Structured  │
-│ Reddit × 2       │    └──────────────────┘    │  5 sections  │
-│ Product Hunt     │     09:00 scrape           └──────────────┘
-│ Tavily Search × 2│     09:20 memo generate
-│ Anthropic New    │
-│ ...              │
+│ AI Blogs (RSS)   │    │  → LLM Memo      │    │              │
+│ Tech Media (RSS) │    │                  │    │  Structured  │
+│ Indie Blogs      │    └──────────────────┘    │  5 sections  │
+│ Reddit           │     09:00 scrape            └──────────────┘
+│ Product Hunt     │     09:20 memo generate
+│ Web Search       │
+│ + your own RSS   │
 └──────────────────┘
 ```
 
-**Sources / 信息源:**
-X/Twitter, Hacker News, GitHub Trending, OpenAI Blog, Google AI Blog, DeepMind, Meta Engineering, Microsoft AI, NVIDIA, HuggingFace, Anthropic News, TechCrunch, The Verge, MIT Tech Review, Wired, Ars Technica, Simon Willison, YC Blog, Reddit (r/SideProject, r/LocalLLaMA), Product Hunt, Tavily Search × 2
+**Included source types / 支持的源类型：**
+X/Twitter, Hacker News, GitHub Trending, AI company blogs (RSS), tech media (RSS), independent blogs, VC blogs, arXiv, Reddit, Product Hunt, Tavily web search. See `config/sources.yaml` for the full starter list — add, remove, or swap sources freely.
 
 **Memo Sections / 简报板块:**
 🧠 Tech & Models · 🚀 Products & Tools · 💡 Ideas · ♟️ Business & Strategy · 🔭 Signals
@@ -74,8 +74,8 @@ python login_save_session.py
 
 # 5. Test run / 验证
 python -m src.pipeline
-# You should see "Pipeline completed" with ~300 items from 23 sources.
-# 你应该看到 "Pipeline completed"，约 300 条来自 23 个源的数据。
+# You should see "Pipeline completed" with items from all enabled sources.
+# 你应该看到 "Pipeline completed"，包含所有已启用源的数据。
 ```
 
 ### Schedule / 设置定时
@@ -154,7 +154,7 @@ Scrape (crontab, pure Python)          Memo (OpenClaw cron, LLM)
 ─────────────────────────────          ──────────────────────────
 09:00  python -m src.pipeline          09:20  LLM reads feed_slim.json
   │                                      │
-  ├─ Fetch 23 sources (~350 raw)         ├─ Reads config/user_profile.md
+  ├─ Fetch all enabled sources            ├─ Reads config/user_profile.md
   ├─ Intra-day dedup (URL + title)       ├─ Reads config/preferences.md
   ├─ Cross-day dedup (memo/*.md)         ├─ Generates 5-section brief
   ├─ Write feed_merged.json              ├─ Sends to user

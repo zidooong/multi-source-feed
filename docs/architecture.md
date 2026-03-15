@@ -31,18 +31,19 @@
      ├── X/Twitter (Playwright)           ──┐
      ├── Hacker News (Algolia API)          │
      ├── GitHub Trending (BeautifulSoup)    │
-     ├── 8 AI company blogs (RSS+scraper)   ├── ~350 raw items
-     ├── 5 tech media (RSS)                 │
-     ├── 2 Reddit subs (API)               │
-     ├── 1 Product Hunt (GraphQL)           │
-     └── 2 Tavily searches (API)          ──┘
+     ├── AI blogs & tech media (RSS)        ├── raw items
+     ├── Indie blogs & VC blogs (RSS)       │
+     ├── arXiv (RSS)                        │
+     ├── Reddit subs (API)                  │
+     ├── Product Hunt (GraphQL)             │
+     └── Tavily web searches (API)        ──┘
      │
      ▼
   Dedup
      ├── Intra-day: URL exact + title similarity (≥0.65)
      └── Cross-day: URLs from last 7 days of memo/*.md
      │
-     ▼  ~300 candidates
+     ▼  deduplicated candidates
   Write feed_merged.json + feed_slim.json + data/YYYY-MM-DD.json
      │
 ─ ─ ─ ─ ─ ─ 20 min gap ─ ─ ─ ─ ─ ─
@@ -82,19 +83,26 @@ Every 2h — OpenClaw cron triggers push/run.sh
   Send selected posts to user
 ```
 
-## Source List (23)
+## Source Types
 
-| Category | Count | Sources |
-|----------|-------|---------|
-| X/Twitter | 1 | For You + Following + Trending (Playwright) |
-| Hacker News | 1 | Algolia API, score ≥ 20 |
-| GitHub | 1 | Trending daily (BeautifulSoup) |
-| AI Company Blogs | 8 | OpenAI, Google AI, DeepMind, Meta, Microsoft, NVIDIA, HuggingFace, Anthropic |
-| Tech Media | 5 | TechCrunch, The Verge, MIT Tech Review, Wired, Ars Technica |
-| Independent Blogs | 1 | Simon Willison |
-| Reddit | 2 | r/SideProject, r/LocalLLaMA |
-| Product Hunt | 1 | Daily top products (GraphQL API) |
-| Web Search | 2 | Tavily (AI products + AI funding) |
+All sources are configured in `config/sources.yaml`. The starter list covers these categories:
+
+| Category | Type | Notes |
+|----------|------|-------|
+| X/Twitter | `x_feed` | For You + Following + Trending (Playwright) |
+| Hacker News | `hn` | Algolia API, configurable min score |
+| GitHub Trending | `github_trending` | Daily trending repos (BeautifulSoup) |
+| AI Company Blogs | `rss` | OpenAI, Google AI, DeepMind, Meta, Microsoft, NVIDIA, HuggingFace, etc. |
+| Tech Media | `rss` | TechCrunch, The Verge, MIT Tech Review, Wired, Ars Technica, Platformer, etc. |
+| Independent Blogs | `rss` | Simon Willison, Lilian Weng, Chip Huyen, Stratechery, etc. |
+| VC / Ecosystem | `rss` | YC Blog, a16z, Sequoia Capital, etc. |
+| AI Research | `rss` | arXiv CS.AI, arXiv CS.LG |
+| Reddit | `reddit` | Configurable subreddits (JSON API) |
+| Product Hunt | `producthunt` | Daily top products (GraphQL API) |
+| Web Search | `web_search` | Tavily API (configurable queries) |
+| Anthropic News | `anthropic_news` | Custom scraper (no public RSS) |
+
+Add your own sources with 4 lines of YAML — see README for details.
 
 ## Storage
 
