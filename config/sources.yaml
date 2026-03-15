@@ -160,20 +160,6 @@ sources:
     max_items: 10
     tags: [blog, ai, applications]
 
-  - name: jay-alammar
-    type: rss
-    enabled: true
-    url: https://jalammar.github.io/feed.xml
-    max_items: 10
-    tags: [blog, ai, ml-visualizations]
-
-  - name: sebastian-raschka
-    type: rss
-    enabled: true
-    url: https://sebastianraschka.com/rss_feed.xml
-    max_items: 10
-    tags: [blog, ai, ml-research]
-
   - name: ahead-of-ai
     type: rss
     enabled: true

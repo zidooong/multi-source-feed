@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # ============================================================
-#  配置
+#  Configuration
 # ============================================================
 PUSH_DIR = Path(__file__).parent
 FEED_RAW = PUSH_DIR / "feed_raw.json"
@@ -18,7 +18,7 @@ NEW_POSTS_FILE = PUSH_DIR / "new_posts.json"
 SEEN_TTL_HOURS = 24
 
 # ============================================================
-#  Seen posts 管理
+#  Seen posts management
 # ============================================================
 def load_seen() -> set[str]:
     if not SEEN_FILE.exists():
@@ -48,7 +48,7 @@ def save_seen(new_urls: set[str]) -> None:
     SEEN_FILE.write_text(json.dumps({"seen": existing}, ensure_ascii=False, indent=2))
 
 # ============================================================
-#  运行爬虫
+#  Run scraper
 # ============================================================
 def run_scraper() -> bool:
     print("🕷️  Running scraper (quick mode)...")
@@ -78,15 +78,15 @@ def run_scraper() -> bool:
         return False
 
 # ============================================================
-#  主流程
+#  Main flow
 # ============================================================
 def main():
-    # 1. 爬取
+    # 1. Scrape
     if not run_scraper():
         print("❌ Scraper failed, aborting")
         sys.exit(1)
 
-    # 2. 加载帖子
+    # 2. Load posts
     if not FEED_RAW.exists():
         print("ℹ️  feed_raw.json not found")
         sys.exit(0)
@@ -95,16 +95,16 @@ def main():
     posts = data.get("posts", [])
     print(f"📦 Loaded {len(posts)} posts")
 
-    # 3. 去重
+    # 3. Dedup
     seen = load_seen()
     new_posts = [p for p in posts if p.get("url", "") not in seen]
     print(f"🆕 {len(new_posts)} new posts after dedup")
 
-    # 4. 更新 seen（所有抓到的帖子都记录，避免下次重复）
+    # 4. Update seen (record all scraped posts to avoid repeats next run)
     all_urls = {p.get("url", "") for p in posts if p.get("url")}
     save_seen(all_urls)
 
-    # 5. 精简字段后写出（减少 agent token 消耗）
+    # 5. Slim down fields before writing (reduce agent token usage)
     KEEP_FIELDS = {"author_handle", "text", "url", "views", "external_links", "is_retweet", "retweeted_by", "timestamp"}
     slim_posts = [{k: v for k, v in p.items() if k in KEEP_FIELDS} for p in new_posts]
     NEW_POSTS_FILE.write_text(

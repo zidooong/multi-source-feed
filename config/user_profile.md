@@ -23,15 +23,15 @@ ChatGPT, Gemini, Perplexity, Claude, Notion AI, Midjourney, Runway, Suno, Lovabl
 Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Vercel, v0, Replit, OpenClaw, Figma AI, Linear, etc.
 
 ### Platforms & Model Distribution
-Hugging Face, Together AI, Groq, Fireworks AI,etc.
+Hugging Face, Together AI, Groq, Fireworks AI, etc.
 
 ### Cloud & AI Hardware
-AWS, Azure, GCP, NVIDIA, AMD, Apple Silicon,etc.
+AWS, Azure, GCP, NVIDIA, AMD, Apple Silicon, etc.
 
 ### Social & Distribution
-X/Twitter, TikTok, YouTube, Reddit, Product Hunt,etc.
+X/Twitter, TikTok, YouTube, Reddit, Product Hunt, etc.
 
 ### Investment & Incubation
-a16z, Sequoia, Y Combinator,etc.
+a16z, Sequoia, Y Combinator, etc.
 
 > If any of the above entities have major news (product launch, funding, strategic partnership, major controversy), it MUST appear in the brief.

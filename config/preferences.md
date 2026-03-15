@@ -13,12 +13,12 @@ JSON (`feed_slim.json`), `items` array, each item contains:
 ## Filtering Criteria
 1. **Product-oriented first**: new application scenarios > pure technical optimization. Reference "cares about / doesn't care about" in user_profile.md
 2. **Strictly filter out irrelevant topics**: anything listed under "doesn't care about" in user_profile.md (pure infrastructure, GPU communication, cluster scheduling, etc.) should be discarded entirely — do not include in any section
-2. **Author weight**: founders, product leads, well-known bloggers > ordinary accounts
-3. **Cross-source validation**: same event appearing across multiple sources → significantly boost weight
-4. **Never miss Key Players**: when entities listed in user_profile.md have major updates, they must be covered
-5. Same event mentioned in multiple items → merge, pick the most informative original post
-6. For retweets, credit the original author
-7. **Cross-day dedup**: the pipeline has already filtered out URLs that appeared in recent memos. However, the same event may appear under different URLs (different media outlets, different discussion threads) — compare against yesterday's memo content. If a topic was already covered as a standalone item in detail yesterday, do not repeat it today. If there is a clear follow-up development (new data, new decision, new reaction), a brief mention is acceptable, but do not make it a standalone item.
+3. **Author weight**: founders, product leads, well-known bloggers > ordinary accounts
+4. **Cross-source validation**: same event appearing across multiple sources → significantly boost weight
+5. **Never miss Key Players**: when entities listed in user_profile.md have major updates, they must be covered
+6. Same event mentioned in multiple items → merge, pick the most informative original post
+7. For retweets, credit the original author
+8. **Cross-day dedup**: the pipeline has already filtered out URLs that appeared in recent memos. However, the same event may appear under different URLs (different media outlets, different discussion threads) — compare against yesterday's memo content. If a topic was already covered as a standalone item in detail yesterday, do not repeat it today. If there is a clear follow-up development (new data, new decision, new reaction), a brief mention is acceptable, but do not make it a standalone item.
 
 ## Output Format
 
