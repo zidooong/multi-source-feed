@@ -120,7 +120,7 @@ Real-time X/Twitter highlights every 2 hours, complementing the daily brief with
 
 **To enable:**
 
-1. Customize `push/preferences.md` if you want to adjust filtering rules or output format
+1. Customize `push/preferences.md` if you want to adjust filtering rules or X-push output format
 2. Create an OpenClaw cron job that runs every 2 hours. The job should:
    - Run `bash ~/multi-source-feed/push/run.sh` (scrapes X, deduplicates, writes `push/new_posts.json`)
    - Read `push/preferences.md` for filtering rules and output format
@@ -239,7 +239,7 @@ crontab -e
 
 **启用方法：**
 
-1. 按需调整 `push/preferences.md` 中的筛选规则和输出格式
+1. 按需调整 `push/preferences.md` 中的筛选规则和输出格式，单独控制xpush的输出内容
 2. 创建一个每 2 小时运行的 OpenClaw cron job，它需要：
    - 运行 `bash ~/multi-source-feed/push/run.sh`（抓取 X、去重、写入 `push/new_posts.json`）
    - 读取 `push/preferences.md` 了解筛选规则和输出格式
