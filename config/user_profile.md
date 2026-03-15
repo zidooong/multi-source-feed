@@ -2,6 +2,7 @@
 
 ## Role
 // Customize: describe yourself so the LLM knows how to filter and prioritize
+
 AI/tech product enthusiast and builder.
 
 ## Interested In
