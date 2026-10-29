@@ -39,13 +39,13 @@ Classify each item by its **subject/topic**, not by source. The basis is "what i
 Source tags (`[X]`, `[HN]`, `[GitHub]`, `[Blog]`, `[X + HN]`, etc.) go at the end of each item.
 
 ### Item Format (fixed by source type)
-- **X posts**: **[@handle](post URL)** — one sentence (views) [X]. Must use @handle (e.g. @cz_binance), not display name (e.g. CZ). @handle always goes first in the line
-- **HN**: **[Title](URL)** — one sentence (comment count cmts) [HN]. Do not include points
-- **GitHub**: **[owner/repo](URL)** — one sentence (star count stars) [Git]. Use total stars, no emoji
-- **RSS/Blog**: **[Article title](URL)** — one sentence [source name]
-- **Web Search**: **[Title](URL)** — one sentence [source name]
-- **Product Hunt**: **[Product name](URL)** — one sentence (vote count votes) [PH]
-- **Reddit**: **[Title](URL)** — one sentence (comment count cmts) [Reddit]
+- **X posts**: **[@handle](post URL)** — two to three sentences (views) [X]. Must use @handle (e.g. @cz_binance), not display name (e.g. CZ). @handle always goes first in the line
+- **HN**: **[Title](URL)** — two to three sentences (comment count cmts) [HN]. Do not include points
+- **GitHub**: **[owner/repo](URL)** — two to three sentences (star count stars) [Git]. Use total stars, no emoji
+- **RSS/Blog**: **[Article title](URL)** — two to three sentences [source name]
+- **Web Search**: **[Title](URL)** — two to three sentences [source name]
+- **Product Hunt**: **[Product name](URL)** — two to three sentences (vote count votes) [PH]
+- **Reddit**: **[Title](URL)** — two to three sentences (comment count cmts) [Reddit]
 - For any other unknown sources, adapt the format accordingly
 - Use abbreviated metrics: 3.2M, 331K. If no metrics are available, don't force them
 - Include valuable external_links inline: [text](URL)
@@ -60,7 +60,7 @@ Model releases, performance breakthroughs, important papers, new capability unlo
 New product launches, major feature updates, developer tools, open-source projects. Include as many as warranted — quality over quantity.
 
 **Ideas ———————**
-Interesting product ideas, creative builds, unexpected AI use cases, etc. Selection criteria: someone built or conceived a clever product or use case (high priority), indie builds worth imitating, creative demos, counterintuitive product insights. Do not select pure opinion pieces or motivational content unless they contain a specific, actionable product idea. Target 8-10 items — this is the most generous section. Strictly one line per item.
+Interesting product ideas, creative builds, unexpected AI use cases, etc. Selection criteria: someone built or conceived a clever product or use case (high priority), indie builds worth imitating, creative demos, counterintuitive product insights. Do not select pure opinion pieces or motivational content unless they contain a specific, actionable product idea. Target 8-10 items — this is the most generous section. Two to three sentences per item (keep tight; no essays).
 **Selection hints**: High-vote Product Hunt products are natural fits for this section (novel product forms, clever angles); Reddit SideProject indie builds are also a key source; X posts that showcase a specific build process or workflow should be prioritized. Do not automatically ignore items from PH/Reddit — if it's an interesting product idea, it belongs here.
 
 **Business & Strategy ———————**
