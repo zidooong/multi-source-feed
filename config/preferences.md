@@ -53,15 +53,17 @@ Source tags (`[X]`, `[HN]`, `[GitHub]`, `[Blog]`, `[X + HN]`, etc.) go at the en
 
 ### Section Definitions
 
+**Output order (must follow strictly)**: Ideas → Tech & Models → Products & Tools → Business & Strategy → Signals. Ideas is always the first section.
+
+**Ideas ———————**
+Interesting product ideas, creative builds, unexpected AI use cases, etc. Selection criteria: someone built or conceived a clever product or use case (high priority), indie builds worth imitating, creative demos, counterintuitive product insights. Do not select pure opinion pieces or motivational content unless they contain a specific, actionable product idea. Target 8-10 items — this is the most generous section. Two to three sentences per item (keep tight; no essays).
+**Selection hints**: High-vote Product Hunt products are natural fits for this section (novel product forms, clever angles); Reddit SideProject indie builds are also a key source; X posts that showcase a specific build process or workflow should be prioritized. Do not automatically ignore items from PH/Reddit — if it's an interesting product idea, it belongs here.
+
 **Tech & Models ———————**
 Model releases, performance breakthroughs, important papers, new capability unlocks. Include as many as warranted — quality over quantity.
 
 **Products & Tools ———————**
 New product launches, major feature updates, developer tools, open-source projects. Include as many as warranted — quality over quantity.
-
-**Ideas ———————**
-Interesting product ideas, creative builds, unexpected AI use cases, etc. Selection criteria: someone built or conceived a clever product or use case (high priority), indie builds worth imitating, creative demos, counterintuitive product insights. Do not select pure opinion pieces or motivational content unless they contain a specific, actionable product idea. Target 8-10 items — this is the most generous section. Two to three sentences per item (keep tight; no essays).
-**Selection hints**: High-vote Product Hunt products are natural fits for this section (novel product forms, clever angles); Reddit SideProject indie builds are also a key source; X posts that showcase a specific build process or workflow should be prioritized. Do not automatically ignore items from PH/Reddit — if it's an interesting product idea, it belongs here.
 
 **Business & Strategy ———————**
 Funding, M&A, strategic partnerships, policy, major personnel changes. Cover major developments from Key Players listed in user_profile.md. Only include substantive developments, not routine updates. Must not miss major Key Player developments.
